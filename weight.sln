@@ -1,7 +1,7 @@
-﻿
+
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "weight", "Weight\weight.csproj", "{19356DD6-EAC4-405C-9913-14FE43190303}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "weight", "weight.csproj", "{19356DD6-EAC4-405C-9913-14FE43190303}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
