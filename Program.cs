@@ -59,7 +59,7 @@ namespace weight
 			int m = seconds / 60;
 			seconds -= (m * 60);
 			int s = seconds;
-			if (d > 0) return string.Format("{0:0}:{1,2:00}:{2,2:00}:{3,2:00}", d, h, m, s);
+			if (d > 0) return string.Format("{0:0} {1,2:00}:{2,2:00}:{3,2:00}", d, h, m, s);
 			if (h > 0) return string.Format("{0:0}:{1,2:00}:{2,2:00}", h, m, s);
 			if (m > 0) return string.Format("{0:0}:{1,2:00}", m, s);
 			if (s > 0) return string.Format("{0:0}", s);
@@ -101,15 +101,24 @@ namespace weight
 					progress.Append(ruler);
 					progress.Append("".PadRight((int)Math.Max(0, RoundUp(weight - targetWeight)), '#') + "\n");
 					int c = 0;
+					int wrap=0;
 					DateTime t = new DateTime(now.Year, now.Month, now.Day, 0, 0, 0);
 					while (t.CompareTo(endDate) <= 0 && daysLeft > 0)
 					{
-						if (c != 0 && t.DayOfWeek == DayOfWeek.Monday) progress.Append(".");
+						if (c != 0 && t.DayOfWeek == DayOfWeek.Monday) 
+						{
+							progress.Append(".");
+							wrap++;
+						}
 						progress.Append(t.ToString("MMM").ToLower()[0]);
 						t = t.AddDays(1);
 						c++;
+						wrap++;
+						if (wrap % 70 == 0)
+							progress.Append("\n");
 					}
-					progress.Append(string.Format("\n{0:0.0000}\n{1:#,###} ({2})", remain, secondsLeft, FormatSeconds(secondsLeft)));
+					//progress.Append(string.Format("\n{0:0.0000}\n{1:#,###} ({2})", remain, secondsLeft, FormatSeconds(secondsLeft)));
+					progress.Append(string.Format("\n{0:0.0000}\n{1:#,###}", remain, secondsLeft));
 				}
 				UpdateProgress(progress.ToString());
 				timer.Enabled = (weight > targetWeight);
