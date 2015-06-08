@@ -10,26 +10,31 @@ namespace weight
 		private static DateTime startTime;
 		private static DateTime endDate;
 		private static double factor = 2.0 / (86400 * 7);
-		private static string ruler = "----+---200---+---210---+---220---+---230---+---240---+---250---+---260\n";
+		private static string ruler = " ----+---200---+---210---+---220---+---230---+---240---+---250---+---260\n";
 		private static DateTime now;
 		private static double startWeight;
 		private static double targetWeight;
 		private static string displayProgress = "";
+		private static int delta = 28800;
 
 		static void Main(string[] args)
 		{
 			try
 			{
-			if (args.Length != 3)
-			{
-				Console.WriteLine("weight <start time> <start weight> <target weight>");
-				return;
-			}
+				if (args.Length != 3)
+				{
+					Console.WriteLine("weight <start time> <start weight> <target weight>");
+					return;
+				}
+				Console.CursorVisible = false;
+				now = DateTime.Now;
 				startTime = DateTime.Parse(args[0]);
 				startWeight = double.Parse(args[1]);
 				targetWeight = double.Parse(args[2]);
 				endDate = startTime.AddSeconds((startWeight - 190.0) / factor);
-				using (timer = new Timer(1000))
+				Console.Clear();
+				Console.WriteLine(ruler);
+				using (timer = new Timer(100))
 				{
 					timer.Elapsed += new ElapsedEventHandler(OnTimer);
 					timer.AutoReset = false;
@@ -42,6 +47,10 @@ namespace weight
 			catch (Exception ex)
 			{
 				Console.WriteLine(ex.Message);
+			}
+			finally
+			{
+				Console.CursorVisible = true;
 			}
 		}
 
@@ -77,7 +86,12 @@ namespace weight
 		{
 			if (string.Compare(progress, displayProgress) != 0)
 			{
-				Console.Clear();
+				Console.SetCursorPosition(0, 1);
+				while (progress.Length > 0)
+				{
+					Console.WriteLine((progress.Length > 70) ? progress.Substring(0, 70) : progress);
+					progress = (progress.Length > 70) ? progress.Substring(70) : "";
+				}
 				Console.WriteLine(progress);
 				displayProgress = progress;
 			}
@@ -88,37 +102,36 @@ namespace weight
 			try
 			{
 				timer.Enabled = false;
-				now = DateTime.Now;
+				//now = DateTime.Now;
+				now = now.AddSeconds(delta);
 				double elapsed = now.Subtract(startTime).TotalSeconds;
 				double weight = Math.Max(startWeight - (elapsed * factor), targetWeight);
 				double remain = weight - targetWeight < 0 ? 0 : weight - targetWeight;
 				double daysLeft = Math.Max(endDate.Subtract(now).TotalDays, 0);
 				int secondsLeft = Math.Max(RoundUp(endDate.Subtract(now).TotalSeconds), 0);
+				if (secondsLeft < 60000)
+					delta = 240;
+				if (secondsLeft < 300)
+					delta = 1;
 				UpdateTitle(weight);
 				StringBuilder progress = new StringBuilder();
-				if (weight > targetWeight)
+				if (secondsLeft >= 0)
 				{
-					progress.Append(ruler);
-					progress.Append("".PadRight((int)Math.Max(0, RoundUp(weight - targetWeight)), '#') + "\n");
+					progress.Append("[" + "".PadRight((int)Math.Max(0, RoundUp(weight - targetWeight)), '#') + "] ");
 					int c = 0;
-					int wrap=0;
 					DateTime t = new DateTime(now.Year, now.Month, now.Day, 0, 0, 0);
+					progress.Append("[");
 					while (t.CompareTo(endDate) <= 0 && daysLeft > 0)
 					{
-						if (c != 0 && t.DayOfWeek == DayOfWeek.Monday) 
-						{
+						if (c != 0 && t.DayOfWeek == DayOfWeek.Monday)
 							progress.Append(".");
-							wrap++;
-						}
 						progress.Append(t.ToString("MMM").ToLower()[0]);
 						t = t.AddDays(1);
 						c++;
-						wrap++;
-						if (wrap % 70 == 0)
-							progress.Append("\n");
 					}
-					//progress.Append(string.Format("\n{0:0.0000}\n{1:#,###} ({2})", remain, secondsLeft, FormatSeconds(secondsLeft)));
-					progress.Append(string.Format("\n{0:0.0000}\n{1:#,###}", remain, secondsLeft));
+					progress.Append((secondsLeft > 0) ? string.Format("] [{0:0.0000}] [{1:#,##0}]     ", remain, secondsLeft) : "] [0] [0]");
+					if (progress.Length < 70)
+						progress.Append("".PadRight(70 - progress.Length));
 				}
 				UpdateProgress(progress.ToString());
 				timer.Enabled = (weight > targetWeight);
