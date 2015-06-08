@@ -109,7 +109,7 @@ namespace weight
 						t = t.AddDays(1);
 						c++;
 					}
-					progress.Append(string.Format("\n{0:0.000000}\n{1} ({2:#,###})", remain, FormatSeconds(secondsLeft), secondsLeft));
+					progress.Append(string.Format("\n{0:0.0000}\n{1:#,###} ({2})", remain, secondsLeft, FormatSeconds(secondsLeft)));
 				}
 				UpdateProgress(progress.ToString());
 				timer.Enabled = (weight > targetWeight);
