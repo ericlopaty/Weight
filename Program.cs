@@ -75,26 +75,8 @@ namespace weight
 			return "";
 		}
 
-		private static void UpdateTitle(double weight)
-		{
-			string display = string.Format("{0:0.00}", weight);
-			if (string.Compare(Console.Title, display) != 0)
-				Console.Title = display;
-		}
-
 		private static void UpdateProgress(string progress)
 		{
-			if (string.Compare(progress, displayProgress) != 0)
-			{
-				Console.SetCursorPosition(0, 1);
-				while (progress.Length > 0)
-				{
-					Console.WriteLine((progress.Length > 70) ? progress.Substring(0, 70) : progress);
-					progress = (progress.Length > 70) ? progress.Substring(70) : "";
-				}
-				Console.WriteLine(progress);
-				displayProgress = progress;
-			}
 		}
 
 		private static void OnTimer(object sender, ElapsedEventArgs args)
@@ -103,37 +85,60 @@ namespace weight
 			{
 				timer.Enabled = false;
 				now = DateTime.Now;
-				//now = now.AddSeconds(delta);
+
 				double elapsed = now.Subtract(startTime).TotalSeconds;
 				double weight = Math.Max(startWeight - (elapsed * factor), targetWeight);
 				double remain = weight - targetWeight < 0 ? 0 : weight - targetWeight;
 				double daysLeft = Math.Max(endDate.Subtract(now).TotalDays, 0);
 				int secondsLeft = Math.Max(RoundUp(endDate.Subtract(now).TotalSeconds), 0);
+
+				StringBuilder daysRemain = new StringBuilder();
+				string poundsRemain = "";
+				string weightRemain = "";
+				string timeRemain = "";
 				string progress = "";
-				if (secondsLeft < 60000)
-					delta = 240;
-				if (secondsLeft < 300)
-					delta = 1;
-				UpdateTitle(weight);
+
+				string display = string.Format("{0:0.00000}", weight);
+				if (string.Compare(Console.Title, display) != 0)
+					Console.Title = display;
+
 				if (secondsLeft >= 0)
 				{
-					string pounds = "".PadRight((int)Math.Max(0, RoundUp(weight - targetWeight)), '#');
-					StringBuilder s = new StringBuilder();
+					poundsRemain = "".PadRight((int)Math.Max(0, RoundUp(weight - targetWeight)), '#');
+
+					daysRemain = new StringBuilder();
 					int c = 0;
 					DateTime t = new DateTime(now.Year, now.Month, now.Day, 0, 0, 0);
 					while (t.CompareTo(endDate) <= 0 && daysLeft > 0)
 					{
-						if (c != 0 && t.DayOfWeek == DayOfWeek.Monday) s.Append(".");
-						s.Append(t.ToString("MMM").ToLower()[0]);
+						if (c != 0 && t.DayOfWeek == DayOfWeek.Monday) daysRemain.Append(".");
+						daysRemain.Append(t.ToString("MMM").ToLower()[0]);
 						t = t.AddDays(1);
 						c++;
 					}
-					string days = s.ToString();
-					string weightRemain = string.Format("{0:0.0000}", remain);
-					string timeRemain = string.Format("{0:#,##0}", secondsLeft);
-					progress = pounds + " " + days + " " + weightRemain + " " + timeRemain + "     ";
+
+					weightRemain = string.Format("{0:0.00000}", remain);
+					timeRemain = string.Format("{0:#,##0}", secondsLeft);
 				}
-				UpdateProgress(progress);
+
+				progress = poundsRemain + " " + daysRemain + " " + weightRemain + " " + timeRemain + "     ";
+				if (string.Compare(progress, displayProgress) != 0)
+				{
+					if (now.Second == 0)
+					{
+						Console.Clear();
+						Console.Write(ruler);
+					}
+					Console.SetCursorPosition(0, 1);
+					while (progress.Length > 0)
+					{
+						Console.WriteLine((progress.Length > 70) ? progress.Substring(0, 70) : progress);
+						progress = (progress.Length > 70) ? progress.Substring(70) : "";
+					}
+					Console.WriteLine(progress);
+					displayProgress = progress;
+				}
+
 				timer.Enabled = (weight > targetWeight);
 			}
 			catch
