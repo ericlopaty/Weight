@@ -12,7 +12,7 @@ namespace weight
 		private static double factor = 2.0 / (86400 * 7);
 		private static string ruler = "----+---200---+---210---+---220---+---230---+---240---+---250---+---260\n";
 		private static DateTime now = DateTime.Now;
-		//private static int delta = 86400;
+		private static int delta = 86400;
 		private static double startWeight;
 		private static double targetWeight;
 		private static string displayProgress = "";
@@ -79,16 +79,17 @@ namespace weight
 			try
 			{
 				timer.Enabled = false;
-				now = DateTime.Now;
-				//now = now.AddSeconds(delta);
+				//now = DateTime.Now;
+				now = now.AddSeconds(delta);
 				double elapsed = now.Subtract(startTime).TotalSeconds;
 				double weight = Math.Max(startWeight - (elapsed * factor), targetWeight);
 				double remain = weight - targetWeight < 0 ? 0 : weight - targetWeight;
 				double daysLeft = Math.Max(endDate.Subtract(now).TotalDays, 0);
 				int secondsLeft = Math.Max(RoundUp(endDate.Subtract(now).TotalSeconds), 0);
-				//if (secondsLeft <= 864000) delta = 3600;
-				//if (secondsLeft <= 86400) delta = 60;
-				//if (secondsLeft <= 3600) delta = 1;
+				if (secondsLeft <= 864000) delta = 3600;
+				if (secondsLeft <= 86400) delta = 240;
+				if (secondsLeft <= 3600) delta = 10;
+				if (secondsLeft <= 100) delta=1;
 				StringBuilder displayDays = new StringBuilder();
 				string displayRemain = "";
 				string displayWeight = "";
@@ -111,8 +112,8 @@ namespace weight
 						t = t.AddDays(1);
 						c++;
 					}
-					displayWeight = string.Format("{0:0.00000}", remain);
-					displayTime = string.Format("{0:#,##0}", secondsLeft);
+					displayWeight = (secondsLeft > 0) ? string.Format("{0:0.00000}", remain) : "";
+					displayTime = (secondsLeft > 0) ? string.Format("{0:#,##0}", secondsLeft) : "";
 					displayClock = FormatSeconds(secondsLeft);
 				}
 				progress = displayRemain + " " + displayDays + " " + displayWeight + " " + displayClock;
