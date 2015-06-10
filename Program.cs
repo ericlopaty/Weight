@@ -116,7 +116,7 @@ namespace weight
 					displayTime = (secondsLeft > 0) ? string.Format("{0:#,##0}", secondsLeft) : "";
 					displayClock = FormatSeconds(secondsLeft);
 				}
-				progress = displayRemain + " " + displayDays + " " + displayWeight + " " + displayClock;
+				progress = displayRemain + " " + displayDays + " " + displayWeight;	// +" " + displayClock;
 				if (progress.Length < displayProgress.Length)
 					progress = progress.PadRight(displayProgress.Length, ' ');
 				if (string.Compare(progress, displayProgress) != 0)
