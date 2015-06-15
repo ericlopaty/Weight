@@ -133,7 +133,6 @@ namespace weight
 						Console.WriteLine((progress.Length > 70) ? progress.Substring(0, 70) : progress);
 						progress = (progress.Length > 70) ? progress.Substring(70) : "";
 					}
-					Console.WriteLine(progress);
 				}
 				timer.Enabled = (weight > targetWeight);
 			}
