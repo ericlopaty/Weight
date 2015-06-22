@@ -22,7 +22,7 @@ namespace weight
 			{
 				if (args.Length != 3)
 				{
-					Console.WriteLine("weight <start time> <start weight> <target weight>");
+					Console.WriteLine("weight <start time> <start weight> <target weight> <table>");
 					return;
 				}
 				Console.CursorVisible = false;
@@ -57,22 +57,6 @@ namespace weight
 			return (int)Math.Ceiling(t);
 		}
 
-		private static string FormatSeconds(int seconds)
-		{
-			int d = (seconds / 86400);
-			seconds -= (d * 86400);
-			int h = seconds / 3600;
-			seconds -= (h * 3600);
-			int m = seconds / 60;
-			seconds -= (m * 60);
-			int s = seconds;
-			if (d > 0) return string.Format("{0:0}:{1,2:00}:{2,2:00}:{3,2:00}", d, h, m, s);
-			if (h > 0) return string.Format("{0:0}:{1,2:00}:{2,2:00}", h, m, s);
-			if (m > 0) return string.Format("{0:0}:{1,2:00}", m, s);
-			if (s > 0) return string.Format("{0:0}", s);
-			return "";
-		}
-
 		private static void OnTimer(object sender, ElapsedEventArgs args)
 		{
 			try
@@ -86,9 +70,6 @@ namespace weight
 				int secondsLeft = Math.Max(RoundUp(endDate.Subtract(now).TotalSeconds), 0);
 				StringBuilder displayDays = new StringBuilder();
 				string displayRemain = "";
-				string displayWeight = "";
-				string displayTime = "";
-				string displayClock = "";
 				string progress = "";
 				string display = string.Format("{0:0.00000}", weight);
 				if (string.Compare(Console.Title, display) != 0)
@@ -106,11 +87,8 @@ namespace weight
 						t = t.AddDays(1);
 						c++;
 					}
-					displayWeight = (secondsLeft > 0) ? string.Format("{0:0.00000}", remain) : "";
-					displayTime = (secondsLeft > 0) ? string.Format("{0:#,##0}", secondsLeft) : "";
-					displayClock = FormatSeconds(secondsLeft);
 				}
-				progress = displayRemain + " " + displayDays;	// +" " + displayWeight;	// +" " + displayClock;
+				progress = displayRemain + " " + displayDays;
 				if (progress.Length < displayProgress.Length)
 					progress = progress.PadRight(displayProgress.Length, ' ');
 				if (string.Compare(progress, displayProgress) != 0)
