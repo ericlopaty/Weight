@@ -71,7 +71,7 @@ namespace weight
 				StringBuilder displayDays = new StringBuilder();
 				string displayRemain = "";
 				string progress = "";
-				string display = string.Format("{0:0.00000}", weight);
+				string display = string.Format("{0:0.0000}", weight);
 				if (string.Compare(Console.Title, display) != 0)
 					Console.Title = display;
 				if (secondsLeft >= 0)
