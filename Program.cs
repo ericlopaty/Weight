@@ -10,26 +10,25 @@ namespace weight
 		private static DateTime startTime;
 		private static DateTime endDate;
 		private static double factor = 2.0 / (86400 * 7);
-		private static string ruler = "----+---200---+---210---+---220---+---230---+---240---+---250---+---260\n";
+        private static string ruler = "----+---190---+---200---+---210---+---220---+---230---+---240---+---250---+";
 		private static DateTime now = DateTime.Now;
 		private static double startWeight;
-		private static double targetWeight;
+        private static double targetWeight = 180;
 		private static string displayProgress = "";
 
 		static void Main(string[] args)
 		{
 			try
 			{
-				if (args.Length != 3)
+				if (args.Length != 2)
 				{
-					Console.WriteLine("weight <start time> <start weight> <target weight> <table>");
+					Console.WriteLine("weight <start time> <start weight>");
 					return;
 				}
 				Console.CursorVisible = false;
 				startTime = DateTime.Parse(args[0]);
 				startWeight = double.Parse(args[1]);
-				targetWeight = double.Parse(args[2]);
-				endDate = startTime.AddSeconds((startWeight - 190.0) / factor);
+				endDate = startTime.AddSeconds((startWeight - targetWeight) / factor);
 				Console.Clear();
 				Console.WriteLine(ruler);
 				using (timer = new Timer(100))
@@ -65,7 +64,6 @@ namespace weight
 				now = DateTime.Now;
 				double elapsed = now.Subtract(startTime).TotalSeconds;
 				double weight = Math.Max(startWeight - (elapsed * factor), targetWeight);
-				double remain = weight - targetWeight < 0 ? 0 : weight - targetWeight;
 				double daysLeft = Math.Max(endDate.Subtract(now).TotalDays, 0);
 				int secondsLeft = Math.Max(RoundUp(endDate.Subtract(now).TotalSeconds), 0);
 				StringBuilder displayDays = new StringBuilder();
@@ -102,8 +100,9 @@ namespace weight
 					Console.SetCursorPosition(0, 1);
 					while (progress.Length > 0)
 					{
-						Console.WriteLine((progress.Length > 70) ? progress.Substring(0, 70) : progress);
-						progress = (progress.Length > 70) ? progress.Substring(70) : "";
+                        int r = ruler.Length;
+						Console.WriteLine((progress.Length > r) ? progress.Substring(0, r) : progress);
+						progress = (progress.Length > r) ? progress.Substring(r) : "";
 					}
 				}
 				timer.Enabled = (weight > targetWeight);
