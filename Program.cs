@@ -6,15 +6,15 @@ namespace weight
 {
 	class Program
 	{
-		private static Timer timer;
-		private static DateTime startTime;
-		private static DateTime endDate;
-		private static double factor = 2.0 / (86400 * 7);
-        private static string ruler = "----+---190---+---200---+---210---+---220---+---230---+---240---+---250---+";
-		private static DateTime now = DateTime.Now;
-		private static double startWeight;
-        private static double targetWeight = 180;
-		private static string displayProgress = "";
+        private const double Factor = 2.0 / (86400 * 7);
+        private const string Ruler = "----+---190---+---200---+---210---+---220---+---230---+---240---+---250---+";
+        private const double TargetWeight = 180;
+        private static Timer _timer;
+		private static DateTime _startTime;
+		private static DateTime _endDate;
+		private static DateTime _now = DateTime.Now;
+		private static double _startWeight;
+		private static string _displayProgress = "";
 
 		static void Main(string[] args)
 		{
@@ -26,19 +26,19 @@ namespace weight
 					return;
 				}
 				Console.CursorVisible = false;
-				startTime = DateTime.Parse(args[0]);
-				startWeight = double.Parse(args[1]);
-				endDate = startTime.AddSeconds((startWeight - targetWeight) / factor);
+                _startTime = DateTime.Parse(args[0]);
+                _startWeight = double.Parse(args[1]);
+                _endDate = _startTime.AddSeconds((_startWeight - TargetWeight) / Factor);
 				Console.Clear();
-				Console.WriteLine(ruler);
-				using (timer = new Timer(100))
+                Console.WriteLine(Ruler);
+                using (_timer = new Timer(100))
 				{
-					timer.Elapsed += new ElapsedEventHandler(OnTimer);
-					timer.AutoReset = false;
-					timer.Enabled = true;
+                    _timer.Elapsed += new ElapsedEventHandler(OnTimer);
+                    _timer.AutoReset = false;
+                    _timer.Enabled = true;
 					Console.ReadLine();
-					timer.Enabled = false;
-					timer.Close();
+                    _timer.Enabled = false;
+                    _timer.Close();
 				}
 			}
 			catch (Exception ex)
@@ -56,29 +56,34 @@ namespace weight
 			return (int)Math.Ceiling(t);
 		}
 
+        private static int Compare(string l, string r)
+        {
+            return string.Compare(l, r,StringComparison.OrdinalIgnoreCase);
+        }
+
 		private static void OnTimer(object sender, ElapsedEventArgs args)
 		{
 			try
 			{
-				timer.Enabled = false;
-				now = DateTime.Now;
-				double elapsed = now.Subtract(startTime).TotalSeconds;
-				double weight = Math.Max(startWeight - (elapsed * factor), targetWeight);
-				double daysLeft = Math.Max(endDate.Subtract(now).TotalDays, 0);
-				int secondsLeft = Math.Max(RoundUp(endDate.Subtract(now).TotalSeconds), 0);
-				StringBuilder displayDays = new StringBuilder();
-				string displayRemain = "";
-				string progress = "";
-				string display = string.Format("{0:0.0000}", weight);
-				if (string.Compare(Console.Title, display) != 0)
+                _timer.Enabled = false;
+                _now = DateTime.Now;
+                var elapsed = _now.Subtract(_startTime).TotalSeconds;
+                var weight = Math.Max(_startWeight - (elapsed * Factor), TargetWeight);
+                var daysLeft = Math.Max(_endDate.Subtract(_now).TotalDays, 0);
+                var secondsLeft = Math.Max(RoundUp(_endDate.Subtract(_now).TotalSeconds), 0);
+				var displayDays = new StringBuilder();
+				var displayRemain = "";
+				var progress = "";
+				var display = string.Format("{0:0.0000}", weight);
+				if (Compare(Console.Title, display) != 0)
 					Console.Title = display;
 				if (secondsLeft >= 0)
 				{
-					displayRemain = "".PadRight((int)Math.Max(0, RoundUp(weight - targetWeight)), '#');
+                    displayRemain = "".PadRight(Math.Max(0, RoundUp(weight - TargetWeight)), '#');
 					displayDays = new StringBuilder();
-					int c = 0;
-					DateTime t = new DateTime(now.Year, now.Month, now.Day, 0, 0, 0);
-					while (t.CompareTo(endDate) <= 0 && daysLeft > 0)
+					var c = 0;
+                    var t = new DateTime(_now.Year, _now.Month, _now.Day, 0, 0, 0);
+                    while (t.CompareTo(_endDate) <= 0 && daysLeft > 0)
 					{
 						if (c != 0 && t.DayOfWeek == DayOfWeek.Monday) displayDays.Append(".");
 						displayDays.Append(t.ToString("MMM").ToLower()[0]);
@@ -87,28 +92,29 @@ namespace weight
 					}
 				}
 				progress = displayRemain + " " + displayDays;
-				if (progress.Length < displayProgress.Length)
-					progress = progress.PadRight(displayProgress.Length, ' ');
-				if (string.Compare(progress, displayProgress) != 0)
+                if (progress.Length < _displayProgress.Length)
+                    progress = progress.PadRight(_displayProgress.Length, ' ');
+                if (Compare(progress, _displayProgress) != 0)
 				{
-					displayProgress = progress;
-					if (now.Second == 0)
+                    _displayProgress = progress;
+                    if (_now.Second == 0)
 					{
 						Console.Clear();
-						Console.Write(ruler);
+                        Console.Write(Ruler);
 					}
 					Console.SetCursorPosition(0, 1);
 					while (progress.Length > 0)
 					{
-                        int r = ruler.Length;
+                        var r = Ruler.Length;
 						Console.WriteLine((progress.Length > r) ? progress.Substring(0, r) : progress);
 						progress = (progress.Length > r) ? progress.Substring(r) : "";
 					}
 				}
-				timer.Enabled = (weight > targetWeight);
+                _timer.Enabled = (weight > TargetWeight);
 			}
-			catch
+			catch (Exception ex)
 			{
+			    Console.WriteLine(ex.Message);
 			}
 		}
 	}
