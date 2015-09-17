@@ -7,7 +7,8 @@ namespace weight
 	class Program
 	{
         private const double Factor = 2.0 / (86400 * 7);
-        private const string Ruler = "----+---190---+---200---+---210---+---220---+---230---+---240---+---250---+";
+        //private const string Ruler = "----+---190---+---200---+---210---+---220---+---230---+---240---+---250---+";
+        private const string Ruler = "----+---190---+---200---+---210---+---220---+---230";
         private const double TargetWeight = 180;
         private static Timer _timer;
 		private static DateTime _startTime;
@@ -74,7 +75,7 @@ namespace weight
 				var displayDays = new StringBuilder();
 				var displayRemain = "";
 				var progress = "";
-				var display = string.Format("{0:0.0000}", weight);
+				var display = string.Format("{0:0.00000}", weight);
 				if (Compare(Console.Title, display) != 0)
 					Console.Title = display;
 				if (secondsLeft >= 0)
@@ -105,7 +106,7 @@ namespace weight
 					Console.SetCursorPosition(0, 1);
 					while (progress.Length > 0)
 					{
-                        var r = Ruler.Length;
+					    var r = 50; // Ruler.Length;
 						Console.WriteLine((progress.Length > r) ? progress.Substring(0, r) : progress);
 						progress = (progress.Length > r) ? progress.Substring(r) : "";
 					}
