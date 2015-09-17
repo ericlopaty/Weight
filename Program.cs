@@ -68,8 +68,8 @@ namespace weight
             var hours = (seconds / 3600);
             seconds -= (hours * 3600);
             var minutes = (seconds / 60);
-            seconds -= (minutes*60);
-            return string.Format("{0} {1}:{2,2:00}:{3,2:00}", days, hours, minutes, seconds);
+            seconds -= (minutes * 60);
+            return string.Format("{0,0}.{1}:{2,2:00}:{3,2:00}", days, hours, minutes, seconds);
         }
 
         private static void OnTimer(object sender, ElapsedEventArgs args)
@@ -85,7 +85,9 @@ namespace weight
                 var displayDays = new StringBuilder();
                 var displayRemain = "";
                 var progress = "";
-                var display = string.Format("{0:0.00000}", weight);
+                var display = string.Format("{0:0.00}", weight);
+                var weightDisplay = string.Format("{0:0.00000}", weight);
+                var weightDisplayRemain = string.Format("{0:0.0000}", weight - TargetWeight);
                 if (Compare(Console.Title, display) != 0)
                     Console.Title = display;
                 if (secondsLeft >= 0)
@@ -102,7 +104,7 @@ namespace weight
                         c++;
                     }
                 }
-                progress = displayRemain + " " + displayDays + " " + DisplayTime(secondsLeft);
+                progress = displayRemain + " " + displayDays + " " + weightDisplayRemain + " " + DisplayTime(secondsLeft);
                 if (progress.Length < _displayProgress.Length)
                     progress = progress.PadRight(_displayProgress.Length, ' ');
                 if (Compare(progress, _displayProgress) != 0)
