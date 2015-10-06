@@ -7,7 +7,7 @@ namespace weight
     class Program
     {
         private const double Factor = 2.0 / (86400 * 7);
-        private const string Ruler = "----+---190---+---200---+---210---+---220---+---230";
+        private const string Ruler = "----+---190---+---200---+---210---+---220";
         private const double TargetWeight = 180;
         private static Timer _timer;
         private static DateTime _startTime;
@@ -61,15 +61,16 @@ namespace weight
             return string.Compare(l, r, StringComparison.OrdinalIgnoreCase);
         }
 
-        private static string DisplayTime(int seconds)
+        private static string DisplayTime(double seconds)
         {
-            var days = (seconds / 86400);
-            seconds -= (days * 86400);
-            var hours = (seconds / 3600);
-            seconds -= (hours * 3600);
-            var minutes = (seconds / 60);
-            seconds -= (minutes * 60);
-            return string.Format("{0,0}.{1}:{2,2:00}:{3,2:00}", days, hours, minutes, seconds);
+            //var days = (seconds / 86400);
+            //seconds -= (days * 86400);
+            //var hours = (seconds / 3600);
+            //seconds -= (hours * 3600);
+            //var minutes = (seconds / 60);
+            //seconds -= (minutes * 60);
+            //return string.Format("{0,0}.{1,2:00}:{2,2:00}:{3,2:00}", days, hours, minutes, seconds);
+            return string.Format("{0:0.00000}", seconds/86400.0);
         }
 
         private static void OnTimer(object sender, ElapsedEventArgs args)
@@ -78,6 +79,7 @@ namespace weight
             {
                 _timer.Enabled = false;
                 _now = DateTime.Now;
+                //_now = _now.AddSeconds(1200);
                 var elapsed = _now.Subtract(_startTime).TotalSeconds;
                 var weight = Math.Max(_startWeight - (elapsed * Factor), TargetWeight);
                 var daysLeft = Math.Max(_endDate.Subtract(_now).TotalDays, 0);
@@ -86,8 +88,8 @@ namespace weight
                 var displayRemain = "";
                 var progress = "";
                 var display = string.Format("{0:0.00}", weight);
-                var weightDisplay = string.Format("{0:0.00000}", weight);
-                var weightDisplayRemain = string.Format("{0:0.0000}", weight - TargetWeight);
+                //var weightDisplay = string.Format("{0:0.000000}", weight);
+                var weightDisplayRemain = string.Format("{0:0.00000}", weight - TargetWeight);
                 if (Compare(Console.Title, display) != 0)
                     Console.Title = display;
                 if (secondsLeft >= 0)
@@ -104,7 +106,8 @@ namespace weight
                         c++;
                     }
                 }
-                progress = displayRemain + " " + displayDays + " " + weightDisplayRemain + " " + DisplayTime(secondsLeft);
+                progress = displayRemain + " " + displayDays + " " + weightDisplayRemain + " " +
+                           DisplayTime(_endDate.Subtract(_now).TotalSeconds); //DisplayTime(secondsLeft);
                 if (progress.Length < _displayProgress.Length)
                     progress = progress.PadRight(_displayProgress.Length, ' ');
                 if (Compare(progress, _displayProgress) != 0)
@@ -118,7 +121,7 @@ namespace weight
                     Console.SetCursorPosition(0, 1);
                     while (progress.Length > 0)
                     {
-                        var r = 50;
+                        var r = 40;
                         Console.WriteLine((progress.Length > r) ? progress.Substring(0, r) : progress);
                         progress = (progress.Length > r) ? progress.Substring(r) : "";
                     }
