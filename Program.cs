@@ -119,10 +119,13 @@ namespace weight
                         Console.Clear();
                         Console.Write(Ruler);
                     }
-                    Console.SetCursorPosition(0, 1);
+                    var top = 1;
                     while (progress.Length > 0)
                     {
-                        Console.WriteLine((progress.Length > R) ? progress.Substring(0, R) : progress);
+                        if (progress[0] == ' ')
+                            progress = progress.Substring(1);
+                        Console.SetCursorPosition(0, top++);
+                        Console.Write((progress.Length > R) ? progress.Substring(0, R) : progress);
                         progress = (progress.Length > R) ? progress.Substring(R) : "";
                     }
                 }
