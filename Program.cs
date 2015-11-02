@@ -89,7 +89,7 @@ namespace weight
                 var displayDays = new StringBuilder();
                 var displayRemain = "";
                 var progress = "";
-                var display = string.Format("{0:0.00}", weight);
+                var display = string.Format("{0:0.00000}", weight);
                 var weightDisplayRemain = string.Format("{0:0.00000}", weight - TargetWeight);
                 if (Compare(Console.Title, display) != 0)
                     Console.Title = display;
@@ -107,8 +107,8 @@ namespace weight
                         c++;
                     }
                 }
-                progress = displayRemain + " " + displayDays + " " + weightDisplayRemain + " " +
-                           DisplayTime(_endDate.Subtract(_now).TotalSeconds);
+                //progress = displayRemain + " " + displayDays + " " + weightDisplayRemain + " " + DisplayTime(_endDate.Subtract(_now).TotalSeconds);
+                progress = displayRemain + " " + displayDays + " " + weightDisplayRemain;
                 if (progress.Length < _displayProgress.Length)
                     progress = progress.PadRight(_displayProgress.Length, ' ');
                 if (Compare(progress, _displayProgress) != 0)
